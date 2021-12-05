@@ -16,6 +16,9 @@ renderer.shadowMap.enabled = true; //enable shadow
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
+const clock = new THREE.Clock();
+clock.start();
+
 //global variables
 const sphericalHelper = new THREE.Spherical();
 const obstacleCollection = [];
@@ -26,13 +29,22 @@ const rollingSpeed = 0.008;
 const middleLane = 0;
 const heroBaseYPos = 1.9;
 
+let animationFramId;
+
 let currentLane;
 let rotatingWorld;
+let bounceValue = 0.1;
+let heroJump = false;
+let isHeroCollided = false;
+let heroHealth = 100;
 
 const hero = Hero();
 scene.add(hero);
 World();
 createObstaclessPool();
+AddLightToScene();
+
+const healthCounter = document.getElementById("health-counter");
 
 function Hero() {
    const heroGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
@@ -50,7 +62,7 @@ function Hero() {
 }
 
 function createObstacles() {
-   const obstacleGeometry = new THREE.BoxBufferGeometry(1, 5, 0.6);
+   const obstacleGeometry = new THREE.BoxBufferGeometry(1, 4, 0.6);
    const obstacleMaterial = new THREE.MeshBasicMaterial({
       color: 0x142f43,
       flatShading: true,
@@ -103,11 +115,11 @@ function addObstaclesToWorld() {
 }
 
 function createObstaclessPool() {
-   let maxTreesInPool = 10;
-   let newTree;
-   for (let i = 0; i < maxTreesInPool; i++) {
-      newTree = createObstacles();
-      obstacleCollection.push(newTree);
+   const maxObstacleInCollection = 12;
+   let newObstacle;
+   for (let i = 0; i < maxObstacleInCollection; i++) {
+      newObstacle = createObstacles();
+      obstacleCollection.push(newObstacle);
    }
 }
 
@@ -119,7 +131,6 @@ function addObstaclesInPath() {
    options.slice(lane, 1);
    if (Math.random() > 0.5) {
       lane = Math.floor(Math.random() * 2);
-      console.log("lane: ", lane);
       generateObstacles(true, options[lane]);
    }
 }
@@ -152,7 +163,84 @@ function AddLightToScene() {
    sun.shadow.camera.near = 0.5;
    sun.shadow.camera.far = 50;
 }
-AddLightToScene();
+
+function handleUserInputs(event) {
+   const { keyCode } = event;
+   const keyPress = {
+      LEFT: 37,
+      RIGHT: 39,
+      UP: 38,
+   };
+
+   const leftLane = -1;
+   const rightLane = 1;
+   if (heroJump) return;
+   let validAction = true;
+
+   if (keyCode === keyPress.LEFT) {
+      //left
+      if (currentLane === middleLane) {
+         currentLane = leftLane;
+      } else if (currentLane === rightLane) {
+         currentLane = middleLane;
+      } else {
+         validAction = false;
+      }
+   } else if (keyCode === keyPress.RIGHT) {
+      // right
+      if (currentLane === middleLane) {
+         currentLane = rightLane;
+      } else if (currentLane === leftLane) {
+         currentLane = middleLane;
+      } else {
+         validAction = false;
+      }
+   } else {
+      if (keyCode === keyPress.UP) {
+         //up
+         bounceValue = 0.1;
+         heroJump = true;
+      }
+      validAction = false;
+   }
+   if (validAction) {
+      heroJump = true;
+      bounceValue = 0.06;
+   }
+}
+
+function ObstacleLogic() {
+   let obstacleMark;
+   let obstaclePos = new THREE.Vector3();
+   let obstacleToRemove = [];
+   obstacleInPath.forEach(function (element, index) {
+      obstacleMark = obstacleInPath[index];
+      obstaclePos.setFromMatrixPosition(obstacleMark.matrixWorld);
+      if (obstaclePos.z > 6 && obstacleMark.visible) {
+         //gone out of our view zone
+         obstacleToRemove.push(obstacleMark);
+      } else {
+         //check collision
+         if (obstaclePos.distanceTo(hero.position) <= 0.6) {
+            heroHealth -= 0.25;
+            console.log("hit");
+            healthCounter.innerText = `Health: ${Math.floor(heroHealth)}`;
+            // if (heroHealth <= 0) {
+            //    gameOver();
+            // }
+         }
+      }
+   });
+   let fromWhere;
+   obstacleToRemove.forEach(function (element, index) {
+      obstacleMark = obstacleToRemove[index];
+      fromWhere = obstacleInPath.indexOf(obstacleMark);
+      obstacleInPath.splice(fromWhere, 1);
+      obstacleCollection.push(obstacleMark);
+      obstacleMark.visible = false;
+      console.log("remove tree");
+   });
+}
 
 function update() {
    const gravity = 0.005;
@@ -162,20 +250,22 @@ function update() {
    // rotate x-axis
    rotatingWorld.rotation.x += rollingSpeed;
    hero.rotation.x -= heroRollingSpeed;
-}
-
-function handleUserInputs(event) {
-   const { keyCode } = event;
-   const keyPress = {
-      LEFT: 37,
-      RIGHT: 39,
-      UP: 38,
-   };
-   if (keyCode === keyPress.LEFT) {
-      console.log("left");
-   } else if (keyCode === keyPress.RIGHT) {
-      console.log("right");
+   if (hero.position.y <= heroBaseYPos) {
+      heroJump = false;
+      bounceValue = Math.random() * 0.04 + 0.005;
    }
+   hero.position.y += bounceValue; // jump effect change ypos per frame
+   hero.position.x = THREE.Math.lerp(
+      hero.position.x,
+      currentLane,
+      2 * clock.getDelta()
+   );
+   bounceValue -= gravity; // gravity remove from val from bounce
+   if (clock.getElapsedTime() > obstacleReleaseInterval) {
+      clock.start();
+      addObstaclesInPath();
+   }
+   ObstacleLogic();
 }
 
 function onWindowResize() {
@@ -187,14 +277,18 @@ function onWindowResize() {
 // dom elements
 document.addEventListener("keydown", handleUserInputs);
 window.addEventListener("resize", onWindowResize);
-const healthCounter = document.getElementById("health-counter");
+
 const coinCounter = document.getElementById("coin-counter");
 const upButton = document.getElementById("up-btn");
 const leftButton = document.getElementById("left-btn");
 const rigthButton = document.getElementById("right-btn");
 
+function gameOver() {
+   cancelAnimationFrame(animationFramId);
+}
+
 function animate() {
-   requestAnimationFrame(animate);
+   animationFramId = requestAnimationFrame(animate);
    renderer.render(scene, camera);
    // 60fps
    update();
