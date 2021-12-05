@@ -43,6 +43,7 @@ let heroJump = false;
 let isHeroCollided = false;
 let heroHealth = 100;
 let coins = 0;
+let collidableObjects;
 
 const healthCounter = document.getElementById("health-counter");
 const coinCounter = document.getElementById("coin-counter");
@@ -62,6 +63,7 @@ function createScene() {
    World();
    createObstaclessPool();
    AddLightToScene();
+   collidableObjects = [...obstacleCollection];
 }
 
 // main character
@@ -77,6 +79,7 @@ function Hero() {
    hero.position.x = currentLane;
    hero.position.y = heroBaseYPos;
    hero.position.z = 4.8;
+   hero.health = 100;
    return hero;
 }
 
@@ -301,19 +304,6 @@ function obstacleLogic() {
       if (obstaclePos.z > 6 && obstacleMark.visible) {
          //gone out of our view zone
          obstacleToRemove.push(obstacleMark);
-      } else {
-         //check collision
-         if (obstaclePos.distanceTo(hero.position) <= 0.7) {
-            heroHealth -= 0.25;
-            //console.log("OBSTACLE HIT");
-            healthCounter.innerText = `Health: ${
-               Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : "00"
-            }`;
-            if (heroHealth <= 0) {
-               restartModal.classList.add("visible");
-               coinCounter.innerText = `Coins: 0`;
-            }
-         }
       }
    });
    // remove from scene after it pass away.
@@ -386,6 +376,47 @@ function update() {
    }
    obstacleLogic();
    coinLogic();
+
+   let originPoint = hero.position.clone();
+
+   for (
+      let vertexIndex = 0;
+      vertexIndex < hero.geometry.vertices.length;
+      vertexIndex++
+   ) {
+      //get current vertex
+      let localVertex = hero.geometry.vertices[vertexIndex].clone();
+      //global vertex matrix
+      let globalVertex = localVertex.applyMatrix4(hero.matrix);
+      //direction going from that vertex -> create raycast
+      let directionVector = globalVertex.sub(hero.position);
+
+      //send beam from
+      //origin point -> character vertex -> to direction of vertex
+      let raycast = new THREE.Raycaster(
+         originPoint,
+         directionVector.clone().normalize()
+      );
+
+      let collisions = raycast.intersectObjects(collidableObjects);
+      if (
+         collisions.length > 0 &&
+         collisions[0].distance < directionVector.length()
+      ) {
+         hero.health -= 0.5;
+         healthCounter.innerText = "Health : " + Math.floor(hero.health);
+         splashScreen.classList.add("active");
+         setTimeout(() => {
+            splashScreen.classList.remove("active");
+         }, 500);
+         if (hero.health <= 1) {
+            restartModal.classList.add("visible");
+            coinCounter.innerText = `Coins: 0`;
+            healthCounter.innerText = "Health : 0";
+         }
+         break;
+      }
+   }
    render();
    requestAnimationFrame(update); //request next update
 }
@@ -427,6 +458,7 @@ const upButton = document.getElementById("up-btn");
 const leftButton = document.getElementById("left-btn");
 const rightButton = document.getElementById("right-btn");
 
+const splashScreen = document.getElementById("splash-screen");
 const startModal = document.getElementById("start-modal");
 const restartModal = document.getElementById("restart-modal");
 
