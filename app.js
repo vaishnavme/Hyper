@@ -1,4 +1,3 @@
-const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 const camera = new THREE.PerspectiveCamera(
    60, //verticle field of view
@@ -29,6 +28,7 @@ const rollingSpeed = 0.008;
 const middleLane = 0;
 const heroBaseYPos = 1.9;
 
+let scene;
 let animationFramId;
 let hero;
 let currentLane;
@@ -38,16 +38,37 @@ let heroJump = false;
 let isHeroCollided = false;
 let heroHealth = 100;
 
-hero = Hero();
-scene.add(hero);
-World();
-createObstaclessPool();
-AddLightToScene();
+// hero = Hero();
+// scene.add(hero);
+// World();
+// createObstaclessPool();
+// AddLightToScene();
 
 const healthCounter = document.getElementById("health-counter");
 const coinCounter = document.getElementById("coin-counter");
 const overflowDiv = document.getElementById("overflow");
 
+function initialize() {
+   createScene();
+   update();
+}
+
+function createScene() {
+   scene = new THREE.Scene();
+   scene.fog = new THREE.FogExp2(0xf0fff0, 0.14);
+
+   hero = Hero();
+   scene.add(hero);
+   heroHealth = 100;
+
+   World();
+   createObstaclessPool();
+   AddLightToScene();
+
+   healthCounter.innerText = `Health: ${Math.floor(heroHealth)}`;
+}
+
+// main character
 function Hero() {
    const heroGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
    const heroMaterial = new THREE.MeshStandardMaterial({
@@ -63,6 +84,7 @@ function Hero() {
    return hero;
 }
 
+// create obstacle
 function createObstacles() {
    const obstacleGeometry = new THREE.BoxBufferGeometry(1, 4, 0.6);
    const obstacleMaterial = new THREE.MeshBasicMaterial({
@@ -73,6 +95,9 @@ function createObstacles() {
    return obstacle;
 }
 
+// generates obstacles in hero path or outside hero path
+// path value taken from obstacleCollection
+// else create new tree
 function generateObstacles(inPath, row, isLeft) {
    let newObstacle;
    const pathAngleValues = [1.52, 1.57, 1.62];
@@ -107,6 +132,7 @@ function generateObstacles(inPath, row, isLeft) {
    rotatingWorld.add(newObstacle);
 }
 
+// add obstacles to world
 function addObstaclesToWorld() {
    const numberOfObstacles = 36;
    const gap = 6.28 / 36;
@@ -116,6 +142,7 @@ function addObstaclesToWorld() {
    }
 }
 
+// add to obstacle collection
 function createObstaclessPool() {
    const maxObstacleInCollection = 12;
    let newObstacle;
@@ -152,6 +179,7 @@ function World() {
    addObstaclesToWorld();
 }
 
+// add sun light to view
 function AddLightToScene() {
    const light = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
    scene.add(light);
@@ -166,6 +194,7 @@ function AddLightToScene() {
    sun.shadow.camera.far = 50;
 }
 
+// handle user action keyboar or click
 function handleUserInputs(action) {
    const leftLane = -1;
    const rightLane = 1;
@@ -205,7 +234,8 @@ function handleUserInputs(action) {
    }
 }
 
-function ObstacleLogic() {
+//
+function obstacleLogic() {
    let obstacleMark;
    let obstaclePos = new THREE.Vector3();
    let obstacleToRemove = [];
@@ -217,8 +247,8 @@ function ObstacleLogic() {
          obstacleToRemove.push(obstacleMark);
       } else {
          //check collision
-         if (obstaclePos.distanceTo(hero.position) <= 0.6) {
-            heroHealth -= 2;
+         if (obstaclePos.distanceTo(hero.position) <= 0.7) {
+            heroHealth -= 1;
             console.log("hit");
             healthCounter.innerText = `Health: ${
                Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : 00
@@ -229,6 +259,7 @@ function ObstacleLogic() {
          }
       }
    });
+   // remove from scene after it pass away.
    let fromWhere;
    obstacleToRemove.forEach(function (element, index) {
       obstacleMark = obstacleToRemove[index];
@@ -240,6 +271,7 @@ function ObstacleLogic() {
    });
 }
 
+//
 function update() {
    const gravity = 0.005;
    const obstacleReleaseInterval = 0.5;
@@ -259,11 +291,14 @@ function update() {
       2 * clock.getDelta()
    );
    bounceValue -= gravity; // gravity remove from val from bounce
+   // add new obstacle if time is passed
    if (clock.getElapsedTime() > obstacleReleaseInterval) {
       clock.start();
       addObstaclesInPath();
    }
-   ObstacleLogic();
+   obstacleLogic();
+   render();
+   requestAnimationFrame(update); //request next update
 }
 
 function onWindowResize() {
@@ -292,7 +327,6 @@ function handleKeys(event) {
 }
 
 function restartGame() {
-   heroHealth = 100;
    overflowDiv.classList.remove("visible");
    overflowDiv.classList.add("hide");
 }
@@ -309,10 +343,8 @@ leftButton.addEventListener("click", () => handleUserInputs("LEFT"));
 rightButton.addEventListener("click", () => handleUserInputs("RIGHT"));
 playAgain.addEventListener("click", restartGame);
 
-function animate() {
-   requestAnimationFrame(animate);
+function render() {
    renderer.render(scene, camera);
-   // 60fps
-   update();
 }
-animate();
+
+initialize();
