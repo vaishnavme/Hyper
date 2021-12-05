@@ -3,3 +3,27 @@
    padding: 0;
    box-sizing: border-box;
 }
+body {
+   font-family: monospace;
+}
+h1 {
+   font-weight: 500;
+   font-size: 1.5rem;
+}
+.game-stats {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 5;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0.2rem 1rem;
+}
+#health-counter {
+   color: #ff5f7e;
+}
+#coin-counter {
+   color: #ffcc1d;
+}
