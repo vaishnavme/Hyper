@@ -29,19 +29,15 @@ const coinsInPath = [];
 
 const heroRadius = 0.2;
 const worldRadius = 26;
-const rollingSpeed = 0.008;
 const middleLane = 0;
 const heroBaseYPos = 1.9;
 
 let scene;
-let animationFramId;
 let hero;
 let currentLane;
 let rotatingWorld;
 let bounceValue = 0.1;
 let heroJump = false;
-let isHeroCollided = false;
-let heroHealth = 100;
 let coins = 0;
 let collidableObjects;
 
@@ -352,6 +348,7 @@ function coinLogic() {
 function update() {
    const gravity = 0.005;
    const obstacleReleaseInterval = 0.5;
+   const rollingSpeed = 0.008;
    const heroRollingSpeed = (rollingSpeed * worldRadius) / heroRadius / 5;
 
    // rotate x-axis
