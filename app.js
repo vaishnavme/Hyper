@@ -169,7 +169,7 @@ function handleUserInputs(event) {
    const keyPress = {
       LEFT: 37,
       RIGHT: 39,
-      FORWARD: 38,
+      UP: 38,
    };
    if (keyCode === keyPress.LEFT) {
       console.log("left");
@@ -178,8 +178,20 @@ function handleUserInputs(event) {
    }
 }
 
+function onWindowResize() {
+   camera.aspect = window.innerWidth / window.innerHeight;
+   camera.updateProjectionMatrix(); // update camera aspects and projectons
+   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
 // dom elements
 document.addEventListener("keydown", handleUserInputs);
+window.addEventListener("resize", onWindowResize);
+const healthCounter = document.getElementById("health-counter");
+const coinCounter = document.getElementById("coin-counter");
+const upButton = document.getElementById("up-btn");
+const leftButton = document.getElementById("left-btn");
+const rigthButton = document.getElementById("right-btn");
 
 function animate() {
    requestAnimationFrame(animate);

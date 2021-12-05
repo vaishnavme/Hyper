@@ -27,3 +27,24 @@ h1 {
 #coin-counter {
    color: #ffcc1d;
 }
+.game-info {
+   position: fixed;
+   bottom: 0;
+   z-index: 5;
+   width: 100%;
+   padding: 0.5rem;
+}
+.game-controls {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+button {
+   background-color: #ffffff;
+   border-radius: 0.5rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 0.5rem;
+   cursor: pointer;
+}
