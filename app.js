@@ -11,7 +11,6 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.y = 2.5;
 camera.position.z = 6.5;
 
-scene.background = new THREE.Color(0xffa500);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true; //enable shadow
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -24,6 +23,7 @@ document.body.appendChild(renderer.domElement);
 const sphericalHelper = new THREE.Spherical();
 const obstacleCollection = [];
 const worldRadius = 26;
+const rollingSpeed = 0.008;
 let rotatingWorld;
 World();
 
@@ -115,8 +115,14 @@ function AddLightToScene() {
 }
 AddLightToScene();
 
+function update() {
+   rotatingWorld.rotation.x += rollingSpeed;
+}
+
 function animate() {
    requestAnimationFrame(animate);
    renderer.render(scene, camera);
+   // 60fps
+   update();
 }
 animate();
