@@ -42,13 +42,7 @@ let bounceValue = 0.1;
 let heroJump = false;
 let isHeroCollided = false;
 let heroHealth = 100;
-let coins;
-
-// hero = Hero();
-// scene.add(hero);
-// World();
-// createObstaclessPool();
-// AddLightToScene();
+let coins = 0;
 
 const healthCounter = document.getElementById("health-counter");
 const coinCounter = document.getElementById("coin-counter");
@@ -65,15 +59,10 @@ function createScene() {
 
    hero = Hero();
    scene.add(hero);
-   heroHealth = 100;
-   coins = 0;
 
    World();
    createObstaclessPool();
-   createCoinsPool();
    AddLightToScene();
-
-   healthCounter.innerText = `Health: ${Math.floor(heroHealth)}`;
 }
 
 // main character
@@ -210,19 +199,11 @@ function generateCoins(inPath, row) {
 
 // add obstacles to world
 function addCoinsToWorld() {
-   const numberOfCoins = 15;
-   const gap = 6.28 / 36;
-   for (let i = 0; i < numberOfCoins; i++) {
-      generateCoins(true, i * gap);
-      generateCoins(true, i * gap);
-   }
-}
-
-// add to obstacle collection
-function createCoinsPool() {
+   const gap = 10 / 36;
    const maxCoinInCollection = 12;
    let newCoin;
    for (let i = 0; i < maxCoinInCollection; i++) {
+      generateCoins(true, i * gap);
       newCoin = createCoins();
       coinsCollections.push(newCoin);
    }
@@ -325,9 +306,9 @@ function obstacleLogic() {
          //check collision
          if (obstaclePos.distanceTo(hero.position) <= 0.7) {
             heroHealth -= 1;
-            console.log("hit");
+            //console.log("OBSTACLE HIT");
             healthCounter.innerText = `Health: ${
-               Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : 00
+               Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : "00"
             }`;
             if (heroHealth <= 0) {
                overflowDiv.classList.add("visible");
@@ -343,7 +324,7 @@ function obstacleLogic() {
       obstacleInPath.splice(fromWhere, 1);
       obstacleCollection.push(obstacleMark);
       obstacleMark.visible = false;
-      console.log("REMOVE OBSTACLE");
+      //console.log("REMOVE OBSTACLE");
    });
 }
 
@@ -374,11 +355,10 @@ function coinLogic() {
       coinsInPath.splice(fromWhere, 1);
       coinsCollections.push(coinMark);
       coinMark.visible = false;
-      console.log("REMOVE COIN");
+      //console.log("REMOVE COIN");
    });
 }
 
-//
 function update() {
    const gravity = 0.005;
    const obstacleReleaseInterval = 0.5;
