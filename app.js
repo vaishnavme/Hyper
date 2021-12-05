@@ -19,10 +19,12 @@ document.body.appendChild(renderer.domElement);
 //global variables
 const sphericalHelper = new THREE.Spherical();
 const obstacleCollection = [];
+const obstacleInPath = [];
+const heroRadius = 0.2;
 const worldRadius = 26;
 const rollingSpeed = 0.008;
 const middleLane = 0;
-const heroBaseYPos = 1.8;
+const heroBaseYPos = 1.9;
 
 let currentLane;
 let rotatingWorld;
@@ -33,8 +35,8 @@ World();
 createObstaclessPool();
 
 function Hero() {
-   const heroGeometry = new THREE.SphereBufferGeometry(15, 32, 16);
-   const heroMaterial = new THREE.MeshBasicMaterial({
+   const heroGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
+   const heroMaterial = new THREE.MeshStandardMaterial({
       color: 0xe5f2f2,
       flatShading: true,
    });
@@ -65,7 +67,7 @@ function generateObstacles(inPath, row, isLeft) {
       newObstacle = obstacleCollection.pop();
       newObstacle.visible = true;
       //console.log("add tree");
-      treesInPath.push(newObstacle);
+      obstacleInPath.push(newObstacle);
       sphericalHelper.set(
          worldRadius - 0.3,
          pathAngleValues[row],
@@ -153,8 +155,31 @@ function AddLightToScene() {
 AddLightToScene();
 
 function update() {
+   const gravity = 0.005;
+   const obstacleReleaseInterval = 0.5;
+   const heroRollingSpeed = (rollingSpeed * worldRadius) / heroRadius / 5;
+
+   // rotate x-axis
    rotatingWorld.rotation.x += rollingSpeed;
+   hero.rotation.x -= heroRollingSpeed;
 }
+
+function handleUserInputs(event) {
+   const { keyCode } = event;
+   const keyPress = {
+      LEFT: 37,
+      RIGHT: 39,
+      FORWARD: 38,
+   };
+   if (keyCode === keyPress.LEFT) {
+      console.log("left");
+   } else if (keyCode === keyPress.RIGHT) {
+      console.log("right");
+   }
+}
+
+// dom elements
+document.addEventListener("keydown", handleUserInputs);
 
 function animate() {
    requestAnimationFrame(animate);
