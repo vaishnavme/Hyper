@@ -16,8 +16,8 @@ renderer.shadowMap.enabled = true; //enable shadow
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-// const hero = Hero();
-// scene.add(hero);
+const hero = Hero();
+scene.add(hero);
 
 //global variables
 const sphericalHelper = new THREE.Spherical();
@@ -26,6 +26,7 @@ const worldRadius = 26;
 const rollingSpeed = 0.008;
 let rotatingWorld;
 World();
+CreateObstaclessPool();
 
 function Hero() {
    const heroGeometry = new THREE.SphereBufferGeometry(15, 32, 16);
@@ -39,6 +40,15 @@ function Hero() {
    hero.position.y = 1.6;
    hero.position.z = 4.8;
    return hero;
+}
+
+function CreateObstaclessPool() {
+   let maxTreesInPool = 10;
+   let newTree;
+   for (let i = 0; i < maxTreesInPool; i++) {
+      newTree = createObstacles();
+      obstacleCollection.push(newTree);
+   }
 }
 
 function createObstacles() {
@@ -94,6 +104,19 @@ function addObstaclesToWorld() {
    }
 }
 
+// add obstacle to hero path
+function addObstaclesInPath() {
+   const options = [0, 1, 2];
+   let lane = Math.floor(Math.random() * 3);
+   generateObstacles(true, lane);
+   options.slice(lane, 1);
+   if (Math.random() > 0.5) {
+      lane = Math.floor(Math.random() * 2);
+      console.log("lane: ", lane);
+      generateObstacles(true, options[lane]);
+   }
+}
+
 function World() {
    const worldGeometry = new THREE.SphereBufferGeometry(worldRadius, 40, 40);
    const worldMaterial = new THREE.MeshStandardMaterial({
@@ -112,6 +135,15 @@ function World() {
 function AddLightToScene() {
    const light = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
    scene.add(light);
+   const sun = new THREE.DirectionalLight(0xcdc1c5, 0.9);
+   sun.position.set(12, 6, -7);
+   sun.castShadow = true;
+   scene.add(sun);
+   //Set up shadow properties for the sun light
+   sun.shadow.mapSize.width = 256;
+   sun.shadow.mapSize.height = 256;
+   sun.shadow.camera.near = 0.5;
+   sun.shadow.camera.far = 50;
 }
 AddLightToScene();
 
