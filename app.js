@@ -218,7 +218,7 @@ function ObstacleLogic() {
       } else {
          //check collision
          if (obstaclePos.distanceTo(hero.position) <= 0.6) {
-            heroHealth -= 0.25;
+            heroHealth -= 2;
             console.log("hit");
             healthCounter.innerText = `Health: ${
                Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : 00
