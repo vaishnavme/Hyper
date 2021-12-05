@@ -16,17 +16,21 @@ renderer.shadowMap.enabled = true; //enable shadow
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
-const hero = Hero();
-scene.add(hero);
-
 //global variables
 const sphericalHelper = new THREE.Spherical();
 const obstacleCollection = [];
 const worldRadius = 26;
 const rollingSpeed = 0.008;
+const middleLane = 0;
+const heroBaseYPos = 1.8;
+
+let currentLane;
 let rotatingWorld;
+
+const hero = Hero();
+scene.add(hero);
 World();
-CreateObstaclessPool();
+createObstaclessPool();
 
 function Hero() {
    const heroGeometry = new THREE.SphereBufferGeometry(15, 32, 16);
@@ -36,19 +40,11 @@ function Hero() {
    });
    const hero = new THREE.Mesh(heroGeometry, heroMaterial);
    hero.castShadow = true;
-   hero.position.x = 0;
-   hero.position.y = 1.6;
+   currentLane = middleLane;
+   hero.position.x = currentLane;
+   hero.position.y = heroBaseYPos;
    hero.position.z = 4.8;
    return hero;
-}
-
-function CreateObstaclessPool() {
-   let maxTreesInPool = 10;
-   let newTree;
-   for (let i = 0; i < maxTreesInPool; i++) {
-      newTree = createObstacles();
-      obstacleCollection.push(newTree);
-   }
 }
 
 function createObstacles() {
@@ -104,6 +100,15 @@ function addObstaclesToWorld() {
    }
 }
 
+function createObstaclessPool() {
+   let maxTreesInPool = 10;
+   let newTree;
+   for (let i = 0; i < maxTreesInPool; i++) {
+      newTree = createObstacles();
+      obstacleCollection.push(newTree);
+   }
+}
+
 // add obstacle to hero path
 function addObstaclesInPath() {
    const options = [0, 1, 2];
@@ -126,9 +131,9 @@ function World() {
    rotatingWorld = new THREE.Mesh(worldGeometry, worldMaterial);
    rotatingWorld.receiveShadow = true;
    rotatingWorld.rotation.z = -Math.PI / 2;
-   scene.add(rotatingWorld);
    rotatingWorld.position.y = -24;
    rotatingWorld.position.z = 2;
+   scene.add(rotatingWorld);
    addObstaclesToWorld();
 }
 
