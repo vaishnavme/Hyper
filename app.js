@@ -20,8 +20,13 @@ clock.start();
 
 //global variables
 const sphericalHelper = new THREE.Spherical();
+//obstacles
 const obstacleCollection = [];
 const obstacleInPath = [];
+// coins
+const coinsCollections = [];
+const coinsInPath = [];
+
 const heroRadius = 0.2;
 const worldRadius = 26;
 const rollingSpeed = 0.008;
@@ -37,6 +42,7 @@ let bounceValue = 0.1;
 let heroJump = false;
 let isHeroCollided = false;
 let heroHealth = 100;
+let coins;
 
 // hero = Hero();
 // scene.add(hero);
@@ -60,9 +66,11 @@ function createScene() {
    hero = Hero();
    scene.add(hero);
    heroHealth = 100;
+   coins = 0;
 
    World();
    createObstaclessPool();
+   createCoinsPool();
    AddLightToScene();
 
    healthCounter.innerText = `Health: ${Math.floor(heroHealth)}`;
@@ -84,7 +92,7 @@ function Hero() {
    return hero;
 }
 
-// create obstacle
+//create obstacle
 function createObstacles() {
    const obstacleGeometry = new THREE.BoxBufferGeometry(1, 4, 0.6);
    const obstacleMaterial = new THREE.MeshBasicMaterial({
@@ -132,7 +140,7 @@ function generateObstacles(inPath, row, isLeft) {
    rotatingWorld.add(newObstacle);
 }
 
-// add obstacles to world
+// // add obstacles to world
 function addObstaclesToWorld() {
    const numberOfObstacles = 36;
    const gap = 6.28 / 36;
@@ -142,7 +150,7 @@ function addObstaclesToWorld() {
    }
 }
 
-// add to obstacle collection
+// // add to obstacle collection
 function createObstaclessPool() {
    const maxObstacleInCollection = 12;
    let newObstacle;
@@ -152,7 +160,7 @@ function createObstaclessPool() {
    }
 }
 
-// add obstacle to hero path
+//  add obstacle to hero path
 function addObstaclesInPath() {
    const options = [0, 1, 2];
    let lane = Math.floor(Math.random() * 3);
@@ -161,6 +169,74 @@ function addObstaclesInPath() {
    if (Math.random() > 0.5) {
       lane = Math.floor(Math.random() * 2);
       generateObstacles(true, options[lane]);
+   }
+}
+
+// coins
+function createCoins() {
+   const coinGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 5, 1);
+   const coinMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff165d,
+      flatShading: true,
+   });
+   const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+   return coin;
+}
+
+function generateCoins(inPath, row) {
+   let newCoin;
+   const pathAngleValues = [1.52, 1.57, 1.62];
+   if (inPath) {
+      if (coinsCollections.length == 0) return;
+      newCoin = coinsCollections.pop();
+      newCoin.visible = true;
+      coinsInPath.push(newCoin);
+      sphericalHelper.set(
+         worldRadius - 0.3,
+         pathAngleValues[row],
+         -rotatingWorld.rotation.x + 4
+      );
+   } else {
+      newCoin = createCoins();
+      sphericalHelper.set(worldRadius - 0.3, forestAreaAngle, row);
+   }
+   newCoin.position.setFromSpherical(sphericalHelper);
+   let rollingGroundVector = rotatingWorld.position.clone().normalize();
+   let treeVector = newCoin.position.clone().normalize();
+   newCoin.quaternion.setFromUnitVectors(treeVector, rollingGroundVector);
+   newCoin.rotation.x += Math.random() * ((2 * Math.PI) / 10) + -Math.PI / 10;
+   rotatingWorld.add(newCoin);
+}
+
+// add obstacles to world
+function addCoinsToWorld() {
+   const numberOfCoins = 15;
+   const gap = 6.28 / 36;
+   for (let i = 0; i < numberOfCoins; i++) {
+      generateCoins(true, i * gap);
+      generateCoins(true, i * gap);
+   }
+}
+
+// add to obstacle collection
+function createCoinsPool() {
+   const maxCoinInCollection = 12;
+   let newCoin;
+   for (let i = 0; i < maxCoinInCollection; i++) {
+      newCoin = createCoins();
+      coinsCollections.push(newCoin);
+   }
+}
+
+// add coins to hero path
+function addCoinInPath() {
+   const options = [0, 1, 2];
+   let lane = Math.floor(Math.random() * 3);
+   generateCoins(true, lane);
+   options.slice(lane, 1);
+   if (Math.random() > 0.5) {
+      lane = Math.floor(Math.random() * 2);
+      generateCoins(true, options[lane]);
    }
 }
 
@@ -177,6 +253,7 @@ function World() {
    rotatingWorld.position.z = 2;
    scene.add(rotatingWorld);
    addObstaclesToWorld();
+   addCoinsToWorld();
 }
 
 // add sun light to view
@@ -234,7 +311,6 @@ function handleUserInputs(action) {
    }
 }
 
-//
 function obstacleLogic() {
    let obstacleMark;
    let obstaclePos = new THREE.Vector3();
@@ -267,7 +343,38 @@ function obstacleLogic() {
       obstacleInPath.splice(fromWhere, 1);
       obstacleCollection.push(obstacleMark);
       obstacleMark.visible = false;
-      console.log("remove tree");
+      console.log("REMOVE OBSTACLE");
+   });
+}
+
+function coinLogic() {
+   let coinMark;
+   let coinPos = new THREE.Vector3();
+   let coinToRemove = [];
+   coinsInPath.forEach(function (element, index) {
+      coinMark = coinsInPath[index];
+      coinPos.setFromMatrixPosition(coinMark.matrixWorld);
+      if (coinPos.z > 6 && coinMark.visible) {
+         //gone out of our view zone
+         coinToRemove.push(coinMark);
+      } else {
+         //check collision
+         if (coinPos.distanceTo(hero.position) <= 0.7) {
+            coins += 0.25;
+            //console.log("COIN HIT");
+            coinCounter.innerText = `Coins: ${Math.floor(coins)}`;
+         }
+      }
+   });
+   // remove from scene after it pass away.
+   let fromWhere;
+   coinToRemove.forEach(function (element, index) {
+      coinMark = coinToRemove[index];
+      fromWhere = coinsInPath.indexOf(coinMark);
+      coinsInPath.splice(fromWhere, 1);
+      coinsCollections.push(coinMark);
+      coinMark.visible = false;
+      console.log("REMOVE COIN");
    });
 }
 
@@ -295,8 +402,10 @@ function update() {
    if (clock.getElapsedTime() > obstacleReleaseInterval) {
       clock.start();
       addObstaclesInPath();
+      addCoinInPath();
    }
    obstacleLogic();
+   coinLogic();
    render();
    requestAnimationFrame(update); //request next update
 }
