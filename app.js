@@ -33,16 +33,27 @@ function Hero() {
    return hero;
 }
 
-function AddRandomObstacle(inPath, row, isLeft) {
-   console.log(inPath, row, isLeft);
+function CreateObstacles() {
+   const obstacleGeometry = new THREE.BoxBufferGeometry(1, 5, 0.6);
+   const obstacleMaterial = new THREE.MeshBasicMaterial({
+      color: 0x142f43,
+      flatShading: true,
+   });
+   const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+   return obstacle;
 }
+
+// function AddRandomObstacle(inPath, row, isLeft) {
+//    console.log(inPath, row, isLeft);
+// }
 
 function AddObstaclesToWorld() {
    const numberOfObstacles = 36;
    const gap = 6.28 / 36;
    for (let i = 0; i < numberOfObstacles; i++) {
-      AddRandomObstacle(false, i * gap, true);
-      AddRandomObstacle(false, i * gap, false);
+      // AddRandomObstacle(false, i * gap, true);
+      // AddRandomObstacle(false, i * gap, false);
+      scene.add(CreateObstacles());
    }
 }
 
