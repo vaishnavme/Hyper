@@ -30,7 +30,7 @@ const middleLane = 0;
 const heroBaseYPos = 1.9;
 
 let animationFramId;
-
+let hero;
 let currentLane;
 let rotatingWorld;
 let bounceValue = 0.1;
@@ -38,7 +38,7 @@ let heroJump = false;
 let isHeroCollided = false;
 let heroHealth = 100;
 
-const hero = Hero();
+hero = Hero();
 scene.add(hero);
 World();
 createObstaclessPool();
@@ -46,6 +46,7 @@ AddLightToScene();
 
 const healthCounter = document.getElementById("health-counter");
 const coinCounter = document.getElementById("coin-counter");
+const overflowDiv = document.getElementById("overflow");
 
 function Hero() {
    const heroGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
@@ -219,10 +220,12 @@ function ObstacleLogic() {
          if (obstaclePos.distanceTo(hero.position) <= 0.6) {
             heroHealth -= 0.25;
             console.log("hit");
-            healthCounter.innerText = `Health: ${Math.floor(heroHealth)}`;
-            // if (heroHealth <= 0) {
-            //    gameOver();
-            // }
+            healthCounter.innerText = `Health: ${
+               Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : 00
+            }`;
+            if (heroHealth <= 0) {
+               overflowDiv.classList.add("visible");
+            }
          }
       }
    });
@@ -288,22 +291,26 @@ function handleKeys(event) {
    }
 }
 
+function restartGame() {
+   heroHealth = 100;
+   overflowDiv.classList.remove("visible");
+   overflowDiv.classList.add("hide");
+}
+
 document.addEventListener("keydown", handleKeys);
 
 const upButton = document.getElementById("up-btn");
 const leftButton = document.getElementById("left-btn");
 const rightButton = document.getElementById("right-btn");
+const playAgain = document.getElementById("play-again");
 
 upButton.addEventListener("click", () => handleUserInputs("UP"));
 leftButton.addEventListener("click", () => handleUserInputs("LEFT"));
 rightButton.addEventListener("click", () => handleUserInputs("RIGHT"));
-
-function gameOver() {
-   cancelAnimationFrame(animationFramId);
-}
+playAgain.addEventListener("click", restartGame);
 
 function animate() {
-   animationFramId = requestAnimationFrame(animate);
+   requestAnimationFrame(animate);
    renderer.render(scene, camera);
    // 60fps
    update();

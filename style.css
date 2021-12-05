@@ -39,12 +39,47 @@ h1 {
    justify-content: center;
    align-items: center;
 }
-button {
+
+.control-btns {
    background-color: #ffffff;
    border-radius: 0.5rem;
    display: flex;
    justify-content: center;
    align-items: center;
    margin: 0.5rem;
+   cursor: pointer;
+}
+
+.overflow {
+   width: 100%;
+   height: 100%;
+   justify-content: center;
+   align-items: center;
+   top: 0;
+   left: 0;
+   z-index: 10;
+   position: fixed;
+   display: none;
+   background-color: hsla(0, 0%, 0%, 0.411);
+}
+.hide {
+   display: none;
+}
+.visible {
+   display: flex;
+}
+.modal {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   width: 20rem;
+   height: 10rem;
+   background-color: #fbffe2;
+   border-radius: 0.5rem;
+   text-align: center;
+   padding: 1rem;
+}
+.play-btn {
+   padding: 0.4rem;
    cursor: pointer;
 }
