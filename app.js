@@ -406,9 +406,11 @@ function update() {
          hero.health -= 0.5;
          healthCounter.innerText = "Health : " + Math.floor(hero.health);
          splashScreen.classList.add("active");
-         setTimeout(() => {
+         let timer;
+         timer = setTimeout(() => {
+            clearTimeout(timer);
             splashScreen.classList.remove("active");
-         }, 500);
+         }, 400);
          if (hero.health <= 1) {
             restartModal.classList.add("visible");
             coinCounter.innerText = `Coins: 0`;

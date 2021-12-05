@@ -48,7 +48,7 @@ h1 {
    z-index: 10;
    position: fixed;
    display: none;
-   background-color: hsla(0, 100%, 51%, 0.267);
+   background-color: hsla(0, 97%, 69%, 0.089);
 }
 .active {
    display: block;
