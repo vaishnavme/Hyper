@@ -33,6 +33,19 @@ function Hero() {
    return hero;
 }
 
+function AddRandomObstacle(inPath, row, isLeft) {
+   console.log(inPath, row, isLeft);
+}
+
+function AddObstaclesToWorld() {
+   const numberOfObstacles = 36;
+   const gap = 6.28 / 36;
+   for (let i = 0; i < numberOfObstacles; i++) {
+      AddRandomObstacle(false, i * gap, true);
+      AddRandomObstacle(false, i * gap, false);
+   }
+}
+
 function World() {
    const worldGeometry = new THREE.SphereBufferGeometry(26, 40, 40);
    const worldMaterial = new THREE.MeshStandardMaterial({
@@ -41,10 +54,18 @@ function World() {
    });
    const world = new THREE.Mesh(worldGeometry, worldMaterial);
    world.receiveShadow = true;
+   //world.rotation.z = -Math.PI / 2;
    world.position.y = -24;
    world.position.z = 2;
+   AddObstaclesToWorld();
    return world;
 }
+
+function AddLightToScene() {
+   const light = new THREE.HemisphereLight(0xfffafa, 0x000000, 0.9);
+   scene.add(light);
+}
+AddLightToScene();
 
 function animate() {
    requestAnimationFrame(animate);
