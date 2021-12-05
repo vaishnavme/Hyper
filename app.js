@@ -45,6 +45,7 @@ createObstaclessPool();
 AddLightToScene();
 
 const healthCounter = document.getElementById("health-counter");
+const coinCounter = document.getElementById("coin-counter");
 
 function Hero() {
    const heroGeometry = new THREE.DodecahedronGeometry(heroRadius, 1);
@@ -164,44 +165,38 @@ function AddLightToScene() {
    sun.shadow.camera.far = 50;
 }
 
-function handleUserInputs(event) {
-   const { keyCode } = event;
-   const keyPress = {
-      LEFT: 37,
-      RIGHT: 39,
-      UP: 38,
-   };
-
+function handleUserInputs(action) {
    const leftLane = -1;
    const rightLane = 1;
    if (heroJump) return;
    let validAction = true;
-
-   if (keyCode === keyPress.LEFT) {
-      //left
-      if (currentLane === middleLane) {
-         currentLane = leftLane;
-      } else if (currentLane === rightLane) {
-         currentLane = middleLane;
-      } else {
-         validAction = false;
-      }
-   } else if (keyCode === keyPress.RIGHT) {
-      // right
-      if (currentLane === middleLane) {
-         currentLane = rightLane;
-      } else if (currentLane === leftLane) {
-         currentLane = middleLane;
-      } else {
-         validAction = false;
-      }
-   } else {
-      if (keyCode === keyPress.UP) {
-         //up
+   switch (action) {
+      case "LEFT":
+         //left;
+         if (currentLane === middleLane) {
+            currentLane = leftLane;
+         } else if (currentLane === rightLane) {
+            currentLane = middleLane;
+         } else {
+            validAction = false;
+         }
+         break;
+      case "RIGHT":
+         //right;
+         if (currentLane === middleLane) {
+            currentLane = rightLane;
+         } else if (currentLane === leftLane) {
+            currentLane = middleLane;
+         } else {
+            validAction = false;
+         }
+         break;
+      case "UP":
          bounceValue = 0.1;
          heroJump = true;
-      }
-      validAction = false;
+         break;
+      default:
+         validAction = false;
    }
    if (validAction) {
       heroJump = true;
@@ -274,14 +269,34 @@ function onWindowResize() {
    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// dom elements
-document.addEventListener("keydown", handleUserInputs);
 window.addEventListener("resize", onWindowResize);
 
-const coinCounter = document.getElementById("coin-counter");
+// dom elements
+function handleKeys(event) {
+   const { keyCode } = event;
+   const keyPress = {
+      LEFT: 37,
+      RIGHT: 39,
+      UP: 38,
+   };
+   if (keyCode === keyPress.UP) {
+      handleUserInputs("UP");
+   } else if (keyCode === keyPress.LEFT) {
+      handleUserInputs("LEFT");
+   } else if (keyCode === keyPress.RIGHT) {
+      handleUserInputs("RIGHT");
+   }
+}
+
+document.addEventListener("keydown", handleKeys);
+
 const upButton = document.getElementById("up-btn");
 const leftButton = document.getElementById("left-btn");
-const rigthButton = document.getElementById("right-btn");
+const rightButton = document.getElementById("right-btn");
+
+upButton.addEventListener("click", () => handleUserInputs("UP"));
+leftButton.addEventListener("click", () => handleUserInputs("LEFT"));
+rightButton.addEventListener("click", () => handleUserInputs("RIGHT"));
 
 function gameOver() {
    cancelAnimationFrame(animationFramId);
