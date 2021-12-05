@@ -46,7 +46,6 @@ let coins = 0;
 
 const healthCounter = document.getElementById("health-counter");
 const coinCounter = document.getElementById("coin-counter");
-const overflowDiv = document.getElementById("overflow");
 
 function initialize() {
    createScene();
@@ -165,7 +164,7 @@ function addObstaclesInPath() {
 function createCoins() {
    const coinGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 5, 1);
    const coinMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff165d,
+      color: 0xfbf46d,
       flatShading: true,
    });
    const coin = new THREE.Mesh(coinGeometry, coinMaterial);
@@ -305,13 +304,14 @@ function obstacleLogic() {
       } else {
          //check collision
          if (obstaclePos.distanceTo(hero.position) <= 0.7) {
-            heroHealth -= 1;
+            heroHealth -= 0.25;
             //console.log("OBSTACLE HIT");
             healthCounter.innerText = `Health: ${
                Math.floor(heroHealth) > 0 ? Math.floor(heroHealth) : "00"
             }`;
             if (heroHealth <= 0) {
-               overflowDiv.classList.add("visible");
+               restartModal.classList.add("visible");
+               coinCounter.innerText = `Coins: 0`;
             }
          }
       }
@@ -416,8 +416,9 @@ function handleKeys(event) {
 }
 
 function restartGame() {
-   overflowDiv.classList.remove("visible");
-   overflowDiv.classList.add("hide");
+   restartModal.classList.remove("visible");
+   restartModal.classList.add("hide");
+   window.location.reload();
 }
 
 document.addEventListener("keydown", handleKeys);
@@ -425,15 +426,28 @@ document.addEventListener("keydown", handleKeys);
 const upButton = document.getElementById("up-btn");
 const leftButton = document.getElementById("left-btn");
 const rightButton = document.getElementById("right-btn");
-const playAgain = document.getElementById("play-again");
+
+const startModal = document.getElementById("start-modal");
+const restartModal = document.getElementById("restart-modal");
+
+const startGameBtn = document.getElementById("start-game");
+const restartGameBtn = document.getElementById("restart-game");
+
+const finalScoreEle = document.getElementById("final-score");
 
 upButton.addEventListener("click", () => handleUserInputs("UP"));
 leftButton.addEventListener("click", () => handleUserInputs("LEFT"));
 rightButton.addEventListener("click", () => handleUserInputs("RIGHT"));
-playAgain.addEventListener("click", restartGame);
+
+startGameBtn.addEventListener("click", startGame);
+restartGameBtn.addEventListener("click", restartGame);
 
 function render() {
    renderer.render(scene, camera);
 }
 
-initialize();
+function startGame() {
+   startModal.classList.remove("visible");
+   startModal.classList.add("hide");
+   initialize();
+}

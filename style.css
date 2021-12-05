@@ -75,13 +75,20 @@ h1 {
    flex-direction: column;
    justify-content: space-between;
    width: 20rem;
-   height: 10rem;
+   height: 15rem;
    background-color: #fbffe2;
    border-radius: 0.5rem;
    text-align: center;
    padding: 1rem;
 }
-.play-btn {
-   padding: 0.4rem;
+.modal-btn {
+   padding: 0.2rem;
    cursor: pointer;
+   font-family: inherit;
+   font-size: 1.5rem;
+}
+ul li {
+   list-style: none;
+   margin: 0.5rem auto;
+   font-size: 1rem;
 }

@@ -21,10 +21,24 @@
          </div>
       </div>
 
-      <div id="overflow" class="overflow">
+      <div id="start-modal" class="overflow visible">
+         <div class="modal">
+            <h1>Welcome to Hyper</h1>
+            <h3>Rules</h3>
+            <ul>
+               <li>Red Block for Coins</li>
+               <li>Black Block Reduces Health</li>
+            </ul>
+            <button class="modal-btn" id="start-game">Start</button>
+         </div>
+      </div>
+
+      <div id="restart-modal" class="overflow">
          <div class="modal">
             <h1>Game Over</h1>
-            <button class="play-btn" id="play-again">Play Again</button>
+
+            <h3 id="final-score"></h3>
+            <button class="modal-btn" id="restart-game">Play Again</button>
          </div>
       </div>
 
