@@ -26,7 +26,7 @@ function World() {
 
 function createObstacle() {
    const obstacleGeometry = new THREE.BoxBufferGeometry(1, 4, 0.6);
-   const obstacleMaterial = new THREE.MesBasicMaterial({
+   const obstacleMaterial = new THREE.MeshBasicMaterial({
       color: 0x142f43,
    });
    const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
