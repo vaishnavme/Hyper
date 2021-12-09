@@ -18,7 +18,7 @@ const camera = new THREE.PerspectiveCamera(
 
 //camera position
 camera.position.y = 2.4;
-camera.position.z = 60.5;
+camera.position.z = 50.5;
 
 const sphericalHelper = new THREE.Spherical();
 const clock = new THREE.Clock();
@@ -45,6 +45,7 @@ function init() {
 
    addLightToScene();
    createObstaclesPool();
+   createCoinsPool();
 }
 
 function addLightToScene() {
@@ -112,6 +113,7 @@ function addObstaclesToPath() {
    const options = [0, 1, 2];
    let lane = Math.floor(Math.random() * 3);
    generateObstacles(true, lane);
+   //remove recent lane used
    options.slice(lane, 1);
    if (Math.random() > 0.5) {
       lane = Math.floor(Math.random() * 2);
@@ -119,10 +121,42 @@ function addObstaclesToPath() {
    }
 }
 
+function generateCoins(row) {
+   const pathAngleValues = [1.52, 1.57, 1.62];
+   let newCoin;
+
+   if (coinsCollection.length === 0) return;
+   newCoin = coinsCollection.pop();
+   newCoin.visible = true;
+   coinsInPath.push(newCoin);
+
+   sphericalHelper.set(
+      worldRadius - 0.3,
+      pathAngleValues[row],
+      -world.rotation.x + 6
+   );
+
+   newCoin.position.setFromSpherical(sphericalHelper);
+   const worldVectors = world.position.clone().normalize();
+   const coinVector = newCoin.position.clone().normalize();
+   // set rotation of (arg1) in same direction to arg2
+   newCoin.quaternion.setFromUnitVectors(coinVector, worldVectors);
+   newCoin.rotation.x += Math.random() * ((2 * Math.PI) / 10) + -Math.PI / 10;
+   world.add(newCoin);
+}
+
 function createCoinsPool() {
    for (let i = 0; i < 15; i++) {
       const newCoin = createCoin();
+      coinsCollection.push(newCoin);
    }
+}
+
+function addCoinsInPath() {
+   const options = [0, 1, 2];
+   let lane = Math.floor(Math.random() * 3);
+   generateCoins(lane);
+   options.slice(lane, 1);
 }
 
 //helpers
@@ -141,6 +175,7 @@ function update() {
    if (clock.getElapsedTime() > obstacleReleaseTime) {
       clock.start(); //restart clock
       addObstaclesToPath();
+      addCoinsInPath();
    }
 }
 

@@ -36,8 +36,8 @@ function createObstacle() {
 }
 
 function createCoin() {
-   const coinGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.5);
-   const coinMaterial = new THREE.MeshStandardMaterial({
+   const coinGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.5, 5, 1);
+   const coinMaterial = new THREE.MeshBasicMaterial({
       color: 0xfbf46d,
    });
    const coin = new THREE.Mesh(coinGeometry, coinMaterial);
