@@ -1,0 +1,108 @@
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+body {
+   font-family: monospace;
+}
+h1 {
+   font-weight: 500;
+   font-size: 1.5rem;
+}
+.game-stats {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   z-index: 5;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0.2rem 1rem;
+}
+#health-counter {
+   color: #ff5f7e;
+}
+#coin-counter {
+   color: #ffcc1d;
+}
+.game-info {
+   position: fixed;
+   bottom: 0;
+   z-index: 5;
+   width: 100%;
+   padding: 0.5rem;
+}
+.game-controls {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.splash {
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   z-index: 10;
+   position: fixed;
+   display: none;
+   background-color: hsla(0, 97%, 69%, 0.089);
+}
+.active {
+   display: block;
+}
+
+.control-btns {
+   background-color: #ffffff;
+   border-radius: 0.5rem;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin: 0.5rem;
+   cursor: pointer;
+   width: 50px;
+   height: 50px;
+}
+
+.overflow {
+   width: 100%;
+   height: 100%;
+   justify-content: center;
+   align-items: center;
+   top: 0;
+   left: 0;
+   z-index: 10;
+   position: fixed;
+   display: none;
+   background-color: hsla(0, 0%, 0%, 0.411);
+}
+.hide {
+   display: none;
+}
+.visible {
+   display: flex;
+}
+.modal {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   width: 20rem;
+   height: 15rem;
+   background-color: #fbffe2;
+   border-radius: 0.5rem;
+   text-align: center;
+   padding: 1rem;
+}
+.modal-btn {
+   padding: 0.2rem;
+   cursor: pointer;
+   font-family: inherit;
+   font-size: 1.5rem;
+}
+ul li {
+   list-style: none;
+   margin: 0.5rem auto;
+   font-size: 1rem;
+}

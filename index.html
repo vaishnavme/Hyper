@@ -1,14 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Hyper | Metaverse </title>
-   <link type="text/css" rel="stylesheet" href="./style.css"/>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
-</head>
-<body>
-   <script src="./app.js"></script>
-</body>
+   <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Hyper | Metaverse</title>
+      <link type="text/css" rel="stylesheet" href="./style.css" />
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
+   </head>
+   <body>
+      <div class="game-stats">
+         <div>
+            <h1>Hyper</h1>
+         </div>
+         <div>
+            <h1 id="health-counter">Health: 100</h1>
+         </div>
+         <div>
+            <h1 id="coin-counter">Coins: 0</h1>
+         </div>
+      </div>
+
+      <div id="splash-screen" class="splash"></div>
+
+      <div id="start-modal" class="overflow visible">
+         <div class="modal">
+            <h1>Welcome to Hyper</h1>
+            <h3>Rules</h3>
+            <ul>
+               <li>🟨 Yellow Block for Coins</li>
+               <li>⬛ Black Block Reduces Health</li>
+            </ul>
+            <button class="modal-btn" id="start-game">Start</button>
+         </div>
+      </div>
+
+      <div id="restart-modal" class="overflow">
+         <div class="modal">
+            <h1>Game Over</h1>
+
+            <h3 id="final-score"></h3>
+            <button class="modal-btn" id="restart-game">Play Again</button>
+         </div>
+      </div>
+
+      <div class="game-info">
+         <div class="game-controls">
+            <button class="control-btns" id="left-btn">
+               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                  <polyline points="15 6 9 12 15 18" />
+               </svg>
+            </button>
+            <button class="control-btns" id="up-btn">
+               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-up" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                  <polyline points="6 15 12 9 18 15" />
+               </svg>
+            </button>
+            <button class="control-btns" id="right-btn">
+               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-right" width="48" height="48" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                  <polyline points="9 6 15 12 9 18" />
+               </svg>
+            </button>
+         </div>
+      </div>
+
+
+
+      <script src="./app.js"></script>
+   </body>
 </html>
